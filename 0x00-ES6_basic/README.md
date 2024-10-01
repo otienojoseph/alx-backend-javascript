@@ -2,12 +2,10 @@
 
 ## Tasks
 
-*0. const or let?*
-Modify:
-    - function 'taskFirst' to instantiate variables using 'const'
-    - function 'taskNext' to instantiate variables using 'let'
+**0. const or let?**
+Modify: - function 'taskFirst' to instantiate variables using 'const' - function 'taskNext' to instantiate variables using 'let'
 
-*1. Block Scope*
+**1. Block Scope**
 Given what you’ve read about var and hoisting, modify the variables inside the function taskBlock so that the variables aren’t overwritten inside the conditional block.
 
 ```
@@ -31,13 +29,13 @@ import taskBlock from './1-block-scoped.js';
 console.log(taskBlock(true));
 console.log(taskBlock(false));
 bob@dylan:~$
-bob@dylan:~$ npm run dev 1-main.js 
+bob@dylan:~$ npm run dev 1-main.js
 [ false, true ]
 [ false, true ]
 bob@dylan:~$
 ```
 
-*2. Arrow functions*
+**2. Arrow functions**
 Rewrite the following standard function to use ES6’s arrow syntax of the function add (it will be an anonymous function after)
 
 ```
@@ -59,12 +57,12 @@ const neighborhoodsList = new getNeighborhoodsList();
 const res = neighborhoodsList.addNeighborhood('Noe Valley');
 console.log(res);
 bob@dylan:~$
-bob@dylan:~$ npm run dev 2-main.js 
+bob@dylan:~$ npm run dev 2-main.js
 [ 'SOMA', 'Union Square', 'Noe Valley' ]
 bob@dylan:~$
 ```
 
-*3. Parameter defaults*
+**3. Parameter defaults**
 Condense the internals of the following function to 1 line - without changing the name of each function/variable.
 
 Hint: The key here to define default parameter values for the function parameters.
@@ -89,9 +87,35 @@ console.log(getSumOfHoods(34));
 console.log(getSumOfHoods(34, 3));
 console.log(getSumOfHoods(34, 3, 4));
 bob@dylan:~$
-bob@dylan:~$ npm run dev 3-main.js 
+bob@dylan:~$ npm run dev 3-main.js
 142
 56
 41
+bob@dylan:~$
+```
+
+**4. Rest parameter syntax for functions**
+Modify the following function to return the number of arguments passed to it using the rest parameter syntax
+
+```
+export default function returnHowManyArguments() {
+
+}
+Example:
+
+> returnHowManyArguments("Hello", "Holberton", 2020);
+3
+>
+Execution:
+
+bob@dylan:~$ cat 4-main.js
+import returnHowManyArguments from './4-rest-parameter.js';
+
+console.log(returnHowManyArguments("one"));
+console.log(returnHowManyArguments("one", "two", 3, "4th"));
+bob@dylan:~$
+bob@dylan:~$ npm run dev 4-main.js
+1
+4
 bob@dylan:~$
 ```
