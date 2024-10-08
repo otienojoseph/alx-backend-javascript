@@ -1,6 +1,6 @@
 import Currency from './3-currency';
 
-export default class Pricing {
+class Pricing {
   constructor(amount, currency) {
     this._amount = amount;
     this._currency = currency;
@@ -32,10 +32,12 @@ export default class Pricing {
     return `${this._amount} ${this._currency.name} (${this._currency.code})`;
   }
 
-  static covertPrice(amount, conversionRate) {
+  static convertPrice(amount, conversionRate) {
     if (typeof amount !== 'number' || typeof conversionRate !== 'number') {
-      throw new Error('Both Amount and conversionRate must be number');
+      throw new Error('Both Amount and conversionRate must be numbers');
     }
     return amount * conversionRate;
   }
 }
+
+export default Pricing;
