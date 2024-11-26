@@ -1,6 +1,7 @@
+const {stdout} = require('node:process');
+
 function displayMessage(param) {
-    console.log(param);
+    process.stdout.write(param + '\n');
 }
 
 module.exports = displayMessage;
-
