@@ -4,8 +4,6 @@
     * @returns (string) Prints message to stdout
 */
   
-function displayMessage(param) {
-    console.log(param);
-}
+const displayMessage = (param) => console.log(param);
 
 module.exports = displayMessage;
