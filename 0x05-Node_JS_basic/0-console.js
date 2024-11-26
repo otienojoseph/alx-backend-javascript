@@ -1,9 +1,8 @@
 /**
     * Prints message to the stdout
-    * @param (string) param - The string to print 
+    * @param (string) message - The string to print 
     * @returns (string) Prints message to stdout
 */
-  
-const displayMessage = (param) => console.log(param);
+const displayMessage = (message) => console.log(message);
 
 module.exports = displayMessage;
