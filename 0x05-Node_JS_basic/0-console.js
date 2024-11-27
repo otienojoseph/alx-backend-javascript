@@ -1,6 +1,6 @@
 /**
     * Prints message to the stdout
-    * @param (string) message - The string to print 
+    * @param (string) message - The string to print
     * @returns (string) Prints message to stdout
 */
 const displayMessage = (message) => {
