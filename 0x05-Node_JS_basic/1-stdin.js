@@ -1,21 +1,21 @@
-const readline = require('readline');
-
 /**
- * Program takes input from command line and prints it to stdout
- * @returns: Prints to stdout the parameter
+ * Program takes name input from STDIN and displays a message containing
+ * the name INPUT to STDOUT
+ *
+ * When the user ends the program, a closing message is displayed
+ *
+ * @returns: Prints to stdout "Your name is: INPUT"
  */
-const r1 = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-});
 
-r1.question("Welcome to Holberton School, what is your name?\n", name => {
-    console.log(`Your name is: ${name}`);
-    r1.close();
+process.stdout.write("Welcome to Holberton School, what is your name?\n");
+
+process.stdin.on("readable", () => {
+    let data = process.stdin.read();
+
+    if (data) {
+        process.stdout.write(`Your name is: ${data}`);
+    }
 })
-
-r1.on('close', () => {
-    console.log("This important software is closing");
-    process.exit(0);
-
+process.stdin.on("end", () => {
+    process.stdout.write("This important software is closing\n");
 });
