@@ -1,6 +1,26 @@
 const http = require('http');
 const fs = require('fs').promises;
 
+const app = http.createServer(async (req, res) => {
+  if (req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello Holberton School!');
+  } else if (req.url === '/students') {
+    // Handle /students path
+    const databasePath = process.argv[2];
+
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.write('This is the list of our students\n');
+
+    try {
+      const studentData = await countStudents(databasePath);
+      res.end(studentData);
+    } catch (error) {
+      res.end(error.message);
+    }
+  }
+});
+
 /**
  * Function reads database csv file synchronously and prints
  * 'Number of students: NUMBER_OF_STUDENTS and log number of
@@ -12,18 +32,15 @@ const fs = require('fs').promises;
  * @returns - Number of students in each field and the list with the
  * following format 'Number of students in FIELD: 6. List: LIST_OF_FIRSTNAMES
  */
-const countStudents = async (path) => {
+async function countStudents(path) {
   try {
     const data = await fs.readFile(path, 'utf8');
-
     const lines = data.split('\n').filter((line) => line.trim() !== '');
 
     if (lines.length <= 1) {
-      console.log('Number of students: 0');
-      return;
+      return 'Number of students: 0\n';
     }
 
-    // Parse headers and rows
     const headers = lines[0].split(',');
     const rows = lines.slice(1);
 
@@ -33,7 +50,6 @@ const countStudents = async (path) => {
     rows.forEach((line) => {
       const values = line.split(',');
 
-      // Skip invalid rows
       if (values.length !== headers.length) return;
 
       const student = {
@@ -51,41 +67,21 @@ const countStudents = async (path) => {
       }
     });
 
-    // Log the total number of students
     let result = `Number of students: ${students.length}\n`;
-    // Log number of students in each field
     Object.keys(fields).forEach((field) => {
       const list = fields[field].join(', ');
       result += `Number of students in ${field}: ${fields[field].length}. List: ${list}\n`;
     });
 
     return result;
-  } catch (err) {
-    throw new Error('Cannot load the database');
+  } catch (error) {
+    throw new Error('Cannot load the database\n');
   }
-};
-
-/**
- * Simple HTTP server
- */
-const app = http.createServer(async (req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  if (req.method === 'GET' && req.url === '/') {
-    res.end('Hello Holberton School');
-  } else if (req.method === 'GET' && req.url === '/students') {
-    const dbPath = process.argv[2];
-    res.write('This is the list of students\n');
-
-    try {
-      const students = await countStudents(dbPath);
-      res.end(students);
-    } catch (error) {
-      res.end('Cannot load the database');
-    }
-  }
-});
+}
 
 module.exports = app;
 
-const PORT = 1245;
-app.listen(PORT, () => console.log(`Server started on ${PORT}`));
+// Start the server on port 1245
+app.listen(1245, () => {
+  console.log('Server is running on port 1245');
+});
