@@ -2,25 +2,6 @@ const http = require('http');
 const fs = require('fs').promises;
 
 /**
- * Simple HTTP server
- */
-const app = http.createServer(async (req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  if (req.method === 'GET' && req.url === '/') {
-    res.end('Hello Holberton School');
-  } else if (req.method === 'GET' && req.url === '/students') {
-    res.write('This is the list of students\n');
-
-    try {
-      const students = await countStudents('database.csv');
-      res.end(students);
-    } catch (error) {
-      res.end('error from catch');
-    }
-  }
-});
-
-/**
  * Function reads database csv file synchronously and prints
  * 'Number of students: NUMBER_OF_STUDENTS and log number of
  * students in each field as follows
@@ -83,6 +64,26 @@ const countStudents = async (path) => {
     throw new Error('Cannot load the database');
   }
 };
+
+/**
+ * Simple HTTP server
+ */
+const app = http.createServer(async (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  if (req.method === 'GET' && req.url === '/') {
+    res.end('Hello Holberton School');
+  } else if (req.method === 'GET' && req.url === '/students') {
+    const dbPath = process.argv[2];
+    res.write('This is the list of students\n');
+
+    try {
+      const students = await countStudents(dbPath);
+      res.end(students);
+    } catch (error) {
+      res.end('Cannot load the database');
+    }
+  }
+});
 
 module.exports = app;
 
