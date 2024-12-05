@@ -62,10 +62,10 @@ async function countStudents(path) {
 const app = http.createServer(async (req, res) => {
   if (req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Hello Holberton School!');
+    res.end('Hello ALX!\n');
   } else if (req.url === '/students') {
     // Handle /students path
-    const databasePath = process.argv[2];
+    const databasePath = process.argv.length > 2 ? process.argv[2] : '';
 
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.write('This is the list of our students\n');
