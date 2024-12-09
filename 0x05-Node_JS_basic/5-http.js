@@ -1,5 +1,5 @@
-const http = require("http");
-const fs = require("fs").promises;
+const http = require('http');
+const fs = require('fs').promises;
 
 /**
  * Function reads database csv file synchronously and prints
@@ -14,21 +14,21 @@ const fs = require("fs").promises;
  */
 async function countStudents(path) {
   try {
-    const data = await fs.readFile(path, "utf8");
-    const lines = data.split("\n").filter((line) => line.trim() !== "");
+    const data = await fs.readFile(path, 'utf8');
+    const lines = data.split('\n').filter((line) => line.trim() !== '');
 
     if (lines.length <= 1) {
-      return "Number of students: 0\n";
+      return 'Number of students: 0\n';
     }
 
-    const headers = lines[0].split(",");
+    const headers = lines[0].split(',');
     const rows = lines.slice(1);
 
     const students = [];
     const fields = {};
 
     rows.forEach((line) => {
-      const values = line.split(",");
+      const values = line.split(',');
 
       if (values.length !== headers.length) return;
 
@@ -49,38 +49,41 @@ async function countStudents(path) {
 
     let result = `Number of students: ${students.length}\n`;
     Object.keys(fields).forEach((field) => {
-      const list = fields[field].join(", ");
+      const list = fields[field].join(', ');
       result += `Number of students in ${field}: ${fields[field].length}. List: ${list}\n`;
     });
 
     return result;
   } catch (error) {
-    throw new Error("Cannot load the database\n");
+    throw new Error('Cannot load the database\n');
   }
 }
 
 const app = http.createServer(async (req, res) => {
-  if (req.url === "/") {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Hello ALX!");
-  } else if (req.url === "/students") {
+  if (req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello ALX!');
+  } else if (req.url === '/students') {
     // Handle /students path
-    const databasePath = process.argv.length > 2 ? process.argv[2] : "";
+    const databasePath = process.argv.length > 2 ? process.argv[2] : '';
 
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.write("This is the list of our students\n");
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.write('This is the list of our students\n');
 
     try {
       const studentData = await countStudents(databasePath);
       res.end(studentData);
     } catch (error) {
-      res.end("Cannot load the database\n");
+      res.end(error.message);
     }
+  } else {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Cannot load the database');
   }
 });
 
 module.exports = app;
 
 app.listen(1245, () => {
-  console.log("Server is running on port 1245");
+  console.log('Server is running on port 1245');
 });
