@@ -74,8 +74,7 @@ const app = http.createServer(async (req, res) => {
       const studentData = await countStudents(databasePath);
       res.end(studentData);
     } catch (error) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end(error.message);
+      res.end('Cannnot load the database\n');
     }
   }
 });
