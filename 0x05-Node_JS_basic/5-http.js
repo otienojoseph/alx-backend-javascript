@@ -1,5 +1,5 @@
 const http = require("http");
-const fs = require("fs").promises;
+const fs = require("fs");
 
 const PORT = 1245;
 const HOST = "localhost";
@@ -16,58 +16,67 @@ const DB_FILE = process.argv.length > 2 ? process.argv[2] : "";
  * @returns - Number of students in each field and the list with the
  * following format 'Number of students in FIELD: 6. List: LIST_OF_FIRSTNAMES
  */
-async function countStudents(path) {
-  try {
-    const data = await fs.readFile(path, "utf8");
-    const lines = data.split("\n").filter((line) => line.trim() !== "");
-
-    if (lines.length <= 1) {
-      return "Number of students: 0\n";
+const countStudents = (dataPath) =>
+  new Promise((resolve, reject) => {
+    if (!dataPath) {
+      reject(new Error("Cannot load the database"));
     }
-
-    const headers = lines[0].split(",");
-    const rows = lines.slice(1);
-
-    const students = [];
-    const fields = {};
-
-    rows.forEach((line) => {
-      const values = line.split(",");
-
-      if (values.length !== headers.length) return;
-
-      const student = {
-        firstname: values[0].trim(),
-        field: values[values.length - 1].trim(),
-      };
-
-      if (student.firstname && student.field) {
-        students.push(student);
-
-        if (!fields[student.field]) {
-          fields[student.field] = [];
+    if (dataPath) {
+      fs.readFile(dataPath, (err, data) => {
+        if (err) {
+          reject(new Error("Cannot load the database"));
         }
-        fields[student.field].push(student.firstname);
-      }
-    });
+        if (data) {
+          const reportParts = [];
+          const fileLines = data.toString("utf-8").trim().split("\n");
+          const studentGroups = {};
+          const dbFieldNames = fileLines[0].split(",");
+          const studentPropNames = dbFieldNames.slice(
+            0,
+            dbFieldNames.length - 1
+          );
 
-    let result = `Number of students: ${students.length}\n`;
-    Object.keys(fields).forEach((field) => {
-      const list = fields[field].join(", ");
-      result += `Number of students in ${field}: ${fields[field].length}. List: ${list}\n`;
-    });
+          for (const line of fileLines.slice(1)) {
+            const studentRecord = line.split(",");
+            const studentPropValues = studentRecord.slice(
+              0,
+              studentRecord.length - 1
+            );
+            const field = studentRecord[studentRecord.length - 1];
+            if (!Object.keys(studentGroups).includes(field)) {
+              studentGroups[field] = [];
+            }
+            const studentEntries = studentPropNames.map((propName, idx) => [
+              propName,
+              studentPropValues[idx],
+            ]);
+            studentGroups[field].push(Object.fromEntries(studentEntries));
+          }
 
-    return result;
-  } catch (error) {
-    throw new Error("Cannot load the database\n");
-  }
-}
+          const totalStudents = Object.values(studentGroups).reduce(
+            (pre, cur) => (pre || []).length + cur.length
+          );
+          reportParts.push(`Number of students: ${totalStudents}`);
+          for (const [field, group] of Object.entries(studentGroups)) {
+            reportParts.push(
+              [
+                `Number of students in ${field}: ${group.length}.`,
+                "List:",
+                group.map((student) => student.firstname).join(", "),
+              ].join(" ")
+            );
+          }
+          resolve(reportParts.join("\n"));
+        }
+      });
+    }
+  });
 
 const SERVER_ROUTE_HANDLERS = [
   {
     route: "/",
     handler(_, res) {
-      const responseText = "Hello Holberton School!";
+      const responseText = "Hello ALX!";
 
       res.setHeader("Content-Type", "text/plain");
       res.setHeader("Content-Length", responseText.length);
