@@ -1,6 +1,10 @@
 const http = require("http");
 const fs = require("fs").promises;
 
+const PORT = 1245;
+const HOST = "localhost";
+const app = http.createServer();
+const DB_FILE = process.argv.length > 2 ? process.argv[2] : "";
 /**
  * Function reads database csv file synchronously and prints
  * 'Number of students: NUMBER_OF_STUDENTS and log number of
@@ -59,35 +63,57 @@ async function countStudents(path) {
   }
 }
 
-const app = http.createServer(async (req, res) => {
-  if (req.url === "/") {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("Hello ALX!");
-  } else if (req.url === "/students") {
-    // Handle /students path
-    const databasePath = process.argv[2];
+const SERVER_ROUTE_HANDLERS = [
+  {
+    route: "/",
+    handler(_, res) {
+      const responseText = "Hello Holberton School!";
 
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    if (!databasePath) {
-      res.end("Cannot load the database\n");
-      return;
-    }
+      res.setHeader("Content-Type", "text/plain");
+      res.setHeader("Content-Length", responseText.length);
+      res.statusCode = 200;
+      res.write(Buffer.from(responseText));
+    },
+  },
+  {
+    route: "/students",
+    handler(_, res) {
+      const responseParts = ["This is the list of our students"];
 
-    res.write("This is the list of our students\n");
-    try {
-      const studentData = await countStudents(databasePath);
-      res.end(studentData);
-    } catch (error) {
-      res.end(error.message);
+      countStudents(DB_FILE)
+        .then((report) => {
+          responseParts.push(report);
+          const responseText = responseParts.join("\n");
+          res.setHeader("Content-Type", "text/plain");
+          res.setHeader("Content-Length", responseText.length);
+          res.statusCode = 200;
+          res.write(Buffer.from(responseText));
+        })
+        .catch((err) => {
+          responseParts.push(
+            err instanceof Error ? err.message : err.toString()
+          );
+          const responseText = responseParts.join("\n");
+          res.setHeader("Content-Type", "text/plain");
+          res.setHeader("Content-Length", responseText.length);
+          res.statusCode = 200;
+          res.write(Buffer.from(responseText));
+        });
+    },
+  },
+];
+
+app.on("request", (req, res) => {
+  for (const routeHandler of SERVER_ROUTE_HANDLERS) {
+    if (routeHandler.route === req.url) {
+      routeHandler.handler(req, res);
+      break;
     }
-  } else {
-    res.writeHead(404, { "Content-Type": "text/plain" });
-    res.end("Not Found!");
   }
 });
 
-module.exports = app;
-
-app.listen(1245, () => {
-  console.log("Server is running on port 1245");
+app.listen(PORT, HOST, () => {
+  process.stdout.write(`Server is running on http://${HOST}:${PORT}`);
 });
+
+module.exports = app;
